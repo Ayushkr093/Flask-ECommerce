@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders Management - Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+    :root {
+        --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        --font-mono: 'Roboto Mono', monospace;
+        
+        /* Modern neutral palette */
+        --background: hsl(220 13% 98%);
+        --foreground: hsl(224 71% 4%);
+        --card: hsl(0 0% 100%);
+        --primary: hsl(221 83% 53%);
+        --primary-foreground: hsl(210 20% 98%);
+        --secondary: hsl(220 13% 91%);
+        --secondary-foreground: hsl(222 47% 11%);
+        --muted: hsl(220 9% 96%);
+        --muted-foreground: hsl(220 9% 46%);
+        --destructive: hsl(0 72% 51%);
+        --destructive-foreground: hsl(0 86% 97%);
+        --border: hsl(220 13% 91%);
+        --ring: hsl(221 83% 53%);
+        --radius: 0.5rem;
+    }
+
+    /* --- Base Styles --- */
+    * { border-color: var(--border); }
+    body {
+        background-color: var(--background);
+        color: var(--foreground);
+        font-family: var(--font-sans);
+        font-size: 14px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        color: var(--foreground);
+        font-weight: 600;
+        letter-spacing: -0.025em;
+    }
+    .font-mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+    .page-header { border-bottom: 1px solid var(--border); }
+    .page-title { color: var(--foreground); }
+    .page-subtitle { color: var(--muted-foreground); }
+
+    /* --- Navigation --- */
+    .navbar {
+        background-color: hsla(0, 0%, 100%, 0.8);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--border);
+        padding: 0.75rem 0;
+    }
+    .navbar-brand { font-weight: 600; font-size: 1rem; color: var(--foreground); text-decoration: none; }
+
+    /* --- Cards --- */
+    .stat-card {
+        background-color: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        position: relative;
+        overflow: hidden;
+    }
+    .stat-card-icon {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        color: var(--muted);
+        font-size: 1.5rem;
+    }
+    .stat-label { font-size: 0.875rem; font-weight: 500; color: var(--muted-foreground); margin-bottom: 0.5rem; }
+    .stat-value { font-family: var(--font-mono); font-size: 1.75rem; font-weight: 600; color: var(--foreground); line-height: 1; }
+    .content-card { background-color: var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); }
+
+    /* --- Buttons --- */
+    .btn { display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius); font-size: 0.875rem; font-weight: 500; padding: 0.5rem 1rem; transition: all 0.2s; text-decoration: none; }
+    .btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+    .btn-primary { background-color: var(--primary); color: var(--primary-foreground); border: 1px solid var(--primary); }
+    .btn-primary:hover { background-color: hsl(221, 83%, 48%); border-color: hsl(221, 83%, 48%); color: var(--primary-foreground); }
+    .btn-icon { background-color: transparent; border: 1px solid transparent; color: var(--muted-foreground); padding: 0.5rem; border-radius: var(--radius); width: 2rem; height: 2rem; }
+    .btn-icon:hover { background-color: var(--muted); color: var(--foreground); }
+    .btn-destructive { color: var(--muted-foreground); }
+    .btn-destructive:hover { background-color: var(--destructive); color: var(--destructive-foreground); }
+
+    /* --- Table --- */
+    .table { --bs-table-bg: transparent; }
+    .table thead th { color: var(--muted-foreground); font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--border); }
+    .table tbody td { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--foreground); }
+    .table tbody tr:last-child td { border-bottom: none; }
+    .table tbody tr:hover { background-color: var(--muted); }
+    .customer-name { font-weight: 500; color: var(--foreground); }
+    .customer-email { font-size: 0.875rem; color: var(--muted-foreground); }
+    
+    /* --- Status Badges --- */
+    .status-badge { display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 500; font-size: 0.75rem; }
+    .status-badge .dot { width: 6px; height: 6px; border-radius: 50%; margin-right: 0.5rem; }
+    .status-completed { background-color: hsl(142 84% 96%); color: hsl(142 60% 25%); }
+    .status-completed .dot { background-color: hsl(142 71% 45%); }
+    .status-pending { background-color: hsl(48 96% 95%); color: hsl(36 78% 28%); }
+    .status-pending .dot { background-color: hsl(45 93% 47%); }
+    .status-cancelled { background-color: hsl(0 86% 97%); color: hsl(0 72% 43%); }
+    .status-cancelled .dot { background-color: hsl(0 84% 60%); }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('list_orders') }}"><i class="fas fa-box-open me-2"></i>Order Management</a>
+        </div>
+    </nav>
+
+    <main class="container my-4">
+        <header class="d-flex justify-content-between align-items-start mb-4 page-header">
+            <div>
+                <h1 class="h3 page-title">Orders</h1>
+                <p class="page-subtitle mb-0">Browse and manage all customer orders.</p>
+            </div>
+            <a href="{{ url_for('create_order') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>New Order
+            </a>
+        </header>
+
+        {% if orders %}
+        <div class="row mb-4 g-4">
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card p-4">
+                    <i class="fas fa-shopping-cart stat-card-icon"></i>
+                    <div class="stat-label">Total Orders</div>
+                    <div class="stat-value">{{ orders|length }}</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card p-4">
+                    <i class="fas fa-check-circle stat-card-icon"></i>
+                    <div class="stat-label">Completed</div>
+                    <div class="stat-value">{{ orders|selectattr('status','equalto','completed')|list|length }}</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card p-4">
+                    <i class="fas fa-hourglass-half stat-card-icon"></i>
+                    <div class="stat-label">Pending</div>
+                    <div class="stat-value">{{ orders|selectattr('status','equalto','pending')|list|length }}</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card p-4">
+                    <i class="fas fa-times-circle stat-card-icon"></i>
+                    <div class="stat-label">Cancelled</div>
+                    <div class="stat-value">{{ orders|selectattr('status','equalto','cancelled')|list|length }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Product</th>
+                            <th>Total Price</th>
+                            <th class="text-center">Status</th>
+                            <th>Date</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>
+                                <strong class="font-mono">#{{ order.id }}</strong>
+                            </td>
+                            <td>
+                                <div class="customer-name">{{ order.user_name or 'N/A' }}</div>
+                                <div class="customer-email">{{ order.user_email or 'No email' }}</div>
+                            </td>
+                            <td>{{ order.product_name or 'N/A' }}</td>
+                            <td class="font-mono">${{ "%.2f"|format(order.total_price) }}</td>
+                            <td class="text-center">
+                                {% if order.status == 'completed' %}
+                                    <span class="status-badge status-completed"><span class="dot"></span>Completed</span>
+                                {% elif order.status == 'pending' %}
+                                    <span class="status-badge status-pending"><span class="dot"></span>Pending</span>
+                                {% else %}
+                                    <span class="status-badge status-cancelled"><span class="dot"></span>Cancelled</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="text-secondary">{{ order.created_at.strftime('%b %d, %Y') if order.created_at else 'N/A' }}</span>
+                            </td>
+                            <td class="text-end">
+                                <a href="{{ url_for('order_details', order_id=order.id) }}" class="btn btn-icon" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                {% if order.status != 'cancelled' %}
+                                <a href="{{ url_for('cancel_order', order_id=order.id) }}" class="btn btn-icon btn-destructive" title="Cancel Order" onclick="return confirm('Cancel order #{{ order.id }}?')">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="content-card">
+            <div class="text-center p-5">
+                <i class="fas fa-inbox fa-3x text-secondary mb-3"></i>
+                <h3>No Orders Found</h3>
+                <p class="text-secondary">Get started by creating your first order.</p>
+                <a href="{{ url_for('create_order') }}" class="btn btn-primary mt-3">
+                    <i class="fas fa-plus me-2"></i>Create First Order
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

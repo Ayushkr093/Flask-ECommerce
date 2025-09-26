@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New User - Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+    :root {
+        --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        --font-mono: 'Roboto Mono', monospace;
+        
+        /* Modern neutral palette */
+        --background: hsl(220 13% 98%);
+        --foreground: hsl(224 71% 4%);
+        --card: hsl(0 0% 100%);
+        --primary: hsl(221 83% 53%);
+        --primary-foreground: hsl(210 20% 98%);
+        --secondary: hsl(220 13% 91%);
+        --secondary-foreground: hsl(222 47% 11%);
+        --muted: hsl(220 9% 96%);
+        --muted-foreground: hsl(220 9% 46%);
+        --border: hsl(220 13% 91%);
+        --ring: hsl(221 83% 53%);
+        --radius: 0.5rem;
+    }
+
+    /* --- Base Styles --- */
+    * { border-color: var(--border); }
+    body {
+        background-color: var(--background);
+        color: var(--foreground);
+        font-family: var(--font-sans);
+        font-size: 14px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        color: var(--foreground);
+        font-weight: 600;
+        letter-spacing: -0.025em;
+    }
+    .font-mono { font-family: var(--font-mono); }
+    .page-header { border-bottom: 1px solid var(--border); }
+    .page-title { color: var(--foreground); }
+    .page-subtitle { color: var(--muted-foreground); }
+
+    /* --- Navigation --- */
+    .navbar {
+        background-color: hsla(0, 0%, 100%, 0.8);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--border);
+        padding: 0.75rem 0;
+    }
+    .navbar-brand { font-weight: 600; font-size: 1rem; color: var(--foreground); text-decoration: none; }
+
+    /* --- Cards & Content --- */
+    .content-card {
+        background-color: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    }
+
+    /* --- Buttons --- */
+    .btn { display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius); font-size: 0.875rem; font-weight: 500; padding: 0.5rem 1rem; transition: all 0.2s; text-decoration: none; }
+    .btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+    .btn-primary { background-color: var(--primary); color: var(--primary-foreground); border: 1px solid var(--primary); }
+    .btn-primary:hover { background-color: hsl(221, 83%, 48%); border-color: hsl(221, 83%, 48%); color: var(--primary-foreground); }
+    .btn-secondary { background-color: var(--card); color: var(--secondary-foreground); border: 1px solid var(--border); }
+    .btn-secondary:hover { background-color: var(--muted); }
+
+    /* --- Form Elements --- */
+    .form-label {
+        font-weight: 500;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+    .form-control, .input-group-text {
+        font-size: 0.875rem;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        background-color: var(--background);
+        padding: 0.5rem 0.75rem;
+    }
+    .form-control:focus {
+        box-shadow: none;
+        border-color: var(--ring);
+        outline: 1px solid var(--ring);
+    }
+    .input-group-text {
+        background-color: var(--muted);
+        color: var(--muted-foreground);
+    }
+    .form-text {
+        font-size: 0.8125rem;
+        color: var(--muted-foreground);
+    }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('list_users') }}"><i class="fas fa-users-cog me-2"></i>User Management</a>
+        </div>
+    </nav>
+
+    <main class="container my-4">
+        <header class="d-flex justify-content-between align-items-start mb-4 page-header">
+            <div>
+                <h1 class="h3 page-title">Add New User</h1>
+                <p class="page-subtitle mb-0">Create a new user profile with a name, email, and starting balance.</p>
+            </div>
+            <a href="{{ url_for('list_users') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Users
+            </a>
+        </header>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="content-card">
+                    <div class="card-body p-4 p-md-5">
+                        <form method="POST" action="{{ url_for('add_user') }}">
+                            <div class="mb-4">
+                                <label for="name" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="name" name="name" 
+                                       placeholder="e.g., Jane Doe" required>
+                                <div class="form-text mt-2">The full name of the user.</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       placeholder="e.g., jane.doe@example.com" required>
+                                <div class="form-text mt-2">A unique email address for the user.</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="cash_balance" class="form-label">Cash Balance</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control font-mono" id="cash_balance" name="cash_balance" 
+                                           step="0.01" min="0" value="0.00" required>
+                                </div>
+                                <div class="form-text mt-2">Initial cash balance for the user.</div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <div class="d-flex justify-content-end">
+                                <a href="{{ url_for('list_users') }}" class="btn btn-secondary me-2">Cancel</a>
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-check me-2"></i>Add User</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('cash_balance').addEventListener('blur', function(e) {
+            if (e.target.value) {
+                e.target.value = parseFloat(e.target.value).toFixed(2);
+            }
+        });
+    </script>
+</body>
+</html>

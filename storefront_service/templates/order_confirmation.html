@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation - MicroStore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+    :root {
+        --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        --font-mono: 'Roboto Mono', monospace;
+        
+        /* Modern neutral palette */
+        --background: hsl(220 13% 98%);
+        --foreground: hsl(224 71% 4%);
+        --card: hsl(0 0% 100%);
+        --primary: hsl(221 83% 53%);
+        --primary-foreground: hsl(210 20% 98%);
+        --secondary: hsl(220 13% 91%);
+        --secondary-foreground: hsl(222 47% 11%);
+        --muted: hsl(220 9% 96%);
+        --muted-foreground: hsl(220 9% 46%);
+        --destructive: hsl(0 72% 51%);
+        --destructive-foreground: hsl(0 86% 97%);
+        --success: hsl(142 71% 45%);
+        --success-foreground: hsl(142 60% 15%);
+        --warning: hsl(45 93% 47%);
+        --warning-foreground: hsl(36 78% 28%);
+        --border: hsl(220 13% 91%);
+        --ring: hsl(221 83% 53%);
+        --radius: 0.5rem;
+    }
+
+    /* --- Base Styles --- */
+    * { border-color: var(--border); }
+    body {
+        background-color: var(--background);
+        color: var(--foreground);
+        font-family: var(--font-sans);
+        font-size: 14px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        color: var(--foreground);
+        font-weight: 600;
+        letter-spacing: -0.025em;
+    }
+    .font-mono { font-family: var(--font-mono); }
+    
+    /* --- Navigation --- */
+    .navbar {
+        background-color: hsla(0, 0%, 100%, 0.8);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--border);
+        padding: 0.75rem 0;
+    }
+    .navbar-brand { font-weight: 600; font-size: 1rem; color: var(--foreground); text-decoration: none; }
+    .cart-link { color: var(--foreground); text-decoration: none; }
+    .cart-badge { position: absolute; top: -4px; right: -8px; background-color: var(--primary); color: var(--primary-foreground); font-size: 0.65rem; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; }
+
+    /* --- Cards & Content --- */
+    .content-card {
+        background-color: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    }
+
+    /* --- Buttons --- */
+    .btn { display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius); font-size: 0.875rem; font-weight: 500; padding: 0.5rem 1rem; transition: all 0.2s; text-decoration: none; }
+    .btn-primary { background-color: var(--primary); color: var(--primary-foreground); border: 1px solid var(--primary); }
+    .btn-primary:hover { background-color: hsl(221, 83%, 48%); border-color: hsl(221, 83%, 48%); }
+
+    /* --- Table --- */
+    .table { --bs-table-bg: transparent; }
+    .table thead th { color: var(--muted-foreground); font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--border); }
+    .table tbody td { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--foreground); }
+    .table tfoot td { padding: 1rem 1.5rem; font-weight: 500; }
+    .table tfoot tr { border-top: 2px solid var(--foreground); }
+    
+    /* --- Confirmation & Alerts --- */
+    .confirmation-icon {
+        width: 64px; height: 64px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin: 0 auto 1rem auto;
+    }
+    .confirmation-icon.success { background-color: hsl(142 84% 96%); color: var(--success); }
+    .confirmation-icon.danger { background-color: hsl(0 86% 97%); color: var(--destructive); }
+    .alert { border-radius: var(--radius); border: 1px solid; font-size: 0.875rem; }
+    .alert-warning { background-color: hsl(48 96% 95%); border-color: hsl(48 96% 85%); color: var(--warning-foreground); }
+    .info-box { background-color: var(--muted); border-radius: var(--radius); padding: 1rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}"><i class="fas fa-store me-2"></i>MicroStore</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link position-relative cart-link" href="{{ url_for('view_cart') }}">
+                    <i class="fas fa-shopping-cart fa-lg"></i>
+                    {% if session.get('cart') %}
+                    <span class="badge rounded-pill cart-badge">{{ session.cart.values()|sum }}</span>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="content-card">
+                    <div class="card-body p-4 p-md-5">
+                        {% if successful_orders %}
+                        <div class="text-center mb-4">
+                            <div class="confirmation-icon success"><i class="fas fa-check"></i></div>
+                            <h2 class="mt-3">Thank You For Your Order!</h2>
+                            <p class="text-secondary">Your purchase has been confirmed and will be processed shortly.</p>
+                        </div>
+                        <div class="mb-4">
+                            <h5 class="mb-3">Order Summary</h5>
+                            <div class="table-responsive border rounded" style="border-radius: var(--radius);">
+                                <table class="table mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th class="text-center">Qty</th>
+                                            <th class="text-end">Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for order in successful_orders %}
+                                        <tr>
+                                            <td>{{ order.product_name }}</td>
+                                            <td class="text-center font-mono">{{ order.quantity }}</td>
+                                            <td class="text-end font-mono"><strong>${{ "%.2f"|format(order.total) }}</strong></td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="2" class="text-end"><strong>Grand Total:</strong></td>
+                                            <td class="text-end h5 mb-0 font-mono"><strong>${{ "%.2f"|format(successful_orders|sum(attribute='total')) }}</strong></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if failed_orders %}
+                        <div class="alert alert-warning">
+                            <h5 class="mb-2"><i class="fas fa-exclamation-triangle me-2"></i>Partial Order Issues</h5>
+                            <p class="mb-2">Some items in your cart could not be processed due to stock changes:</p>
+                            <ul class="mb-0 small">
+                                {% for failed in failed_orders %}<li>{{ failed }}</li>{% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        {% if not successful_orders and not failed_orders %}
+                        <div class="text-center mb-4">
+                            <div class="confirmation-icon danger"><i class="fas fa-times"></i></div>
+                            <h2 class="mt-3">Order Failed</h2>
+                            <p class="text-secondary mb-0">We're sorry, but we couldn't process your order. Your cart has been saved, please try again.</p>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mt-4 info-box text-center">
+                            <h6 class="mb-1">What's Next?</h6>
+                            <p class="small text-secondary mb-0">You will receive an order confirmation email shortly. Orders are typically processed within 24 hours.</p>
+                        </div>
+                        <hr class="my-4">
+                        <div class="text-center">
+                            <a href="{{ url_for('index') }}" class="btn btn-primary"><i class="fas fa-store me-2"></i>Continue Shopping</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

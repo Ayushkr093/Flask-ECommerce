@@ -1,0 +1,117 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: microservices
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppassword"]
+      timeout: 20s
+      retries: 10
+    networks:
+      - microservices-network
+
+  users-service:
+    build: ./users_service
+    ports:
+      - "5001:5000"
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+      MYSQL_DB: microservices
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - microservices-network
+
+  products-service:
+    build: ./products_service
+    ports:
+      - "5002:5000"
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+      MYSQL_DB: microservices
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - microservices-network
+
+  orders-service:
+    build: ./orders_service
+    ports:
+      - "5003:5000"
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+      MYSQL_DB: microservices
+      USERS_SERVICE_URL: http://users-service:5000
+      PRODUCTS_SERVICE_URL: http://products-service:5000
+    depends_on:
+      mysql:
+        condition: service_healthy
+      users-service:
+        condition: service_started
+      products-service:
+        condition: service_started
+    networks:
+      - microservices-network
+
+  storefront-service:
+    build: ./storefront_service
+    ports:
+      - "5000:5000"
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+      MYSQL_DB: microservices
+      PRODUCTS_SERVICE_URL: http://products-service:5000
+      ORDERS_SERVICE_URL: http://orders-service:5000
+      USERS_SERVICE_URL: http://users-service:5000
+    depends_on:
+      mysql:
+        condition: service_healthy
+      products-service:
+        condition: service_started
+      orders-service:
+        condition: service_started
+      users-service:
+        condition: service_started
+    networks:
+      - microservices-network
+
+  metrics-service:
+    build: ./metrics_service
+    ports:
+      - "5005:5000"
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+      MYSQL_DB: microservices
+      MYSQL_PORT: 3306
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - microservices-network
+
+volumes:
+  mysql_data:
+
+networks:
+  microservices-network:
+    driver: bridge

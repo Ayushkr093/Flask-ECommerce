@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - MicroStore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+    :root {
+        --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        --font-mono: 'Roboto Mono', monospace;
+        
+        /* Modern neutral palette */
+        --background: hsl(220 13% 98%);
+        --foreground: hsl(224 71% 4%);
+        --card: hsl(0 0% 100%);
+        --primary: hsl(221 83% 53%);
+        --primary-foreground: hsl(210 20% 98%);
+        --secondary: hsl(220 13% 91%);
+        --secondary-foreground: hsl(222 47% 11%);
+        --muted: hsl(220 9% 96%);
+        --muted-foreground: hsl(220 9% 46%);
+        --destructive: hsl(0 72% 51%);
+        --destructive-foreground: hsl(0 86% 97%);
+        --border: hsl(220 13% 91%);
+        --ring: hsl(221 83% 53%);
+        --radius: 0.5rem;
+    }
+
+    /* --- Base Styles --- */
+    * { border-color: var(--border); }
+    body {
+        background-color: var(--background);
+        color: var(--foreground);
+        font-family: var(--font-sans);
+        font-size: 14px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        padding-top: 72px; /* Added to prevent content from hiding under the fixed navbar */
+    }
+    h1, h2, h3, h4, h5, h6 {
+        color: var(--foreground);
+        font-weight: 600;
+        letter-spacing: -0.025em;
+    }
+    .font-mono { font-family: var(--font-mono); }
+    .page-header { border-bottom: 1px solid var(--border); }
+    .page-title { color: var(--foreground); }
+    .page-subtitle { color: var(--muted-foreground); }
+
+    /* --- Navigation --- */
+    .navbar {
+        background-color: hsla(0, 0%, 100%, 0.8);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--border);
+        padding: 0.75rem 0;
+    }
+    .navbar-brand { font-weight: 600; font-size: 1rem; color: var(--foreground); text-decoration: none; }
+    .cart-link { color: var(--foreground); text-decoration: none; }
+    .cart-badge { position: absolute; top: -4px; right: -8px; background-color: var(--primary); color: var(--primary-foreground); font-size: 0.65rem; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; }
+
+    /* --- Cards & Content --- */
+    .content-card {
+        background-color: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    }
+
+    /* --- Buttons --- */
+    .btn { display: inline-flex; align-items: center; justify-content: center; border-radius: var(--radius); font-size: 0.875rem; font-weight: 500; padding: 0.5rem 1rem; transition: all 0.2s; text-decoration: none; }
+    .btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+    .btn-primary { background-color: var(--primary); color: var(--primary-foreground); border: 1px solid var(--primary); }
+    .btn-primary:hover:not(:disabled) { background-color: hsl(221, 83%, 48%); border-color: hsl(221, 83%, 48%); }
+    .btn-secondary { background-color: var(--card); color: var(--secondary-foreground); border: 1px solid var(--border); }
+    .btn-secondary:hover { background-color: var(--muted); }
+    .btn:disabled { background-color: var(--secondary); border-color: var(--secondary); }
+
+    /* --- Form Elements --- */
+    .form-label { font-weight: 500; font-size: 0.875rem; margin-bottom: 0.5rem; }
+    .form-control, .form-select {
+        font-size: 0.875rem;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        background-color: var(--background);
+        padding: 0.5rem 0.75rem;
+    }
+    .form-control:focus, .form-select:focus { box-shadow: none; border-color: var(--ring); outline: 1px solid var(--ring); }
+    .alert-danger { background-color: hsl(0 86% 97%); border-color: hsl(0 72% 83%); color: hsl(0 72% 43%); border-radius: var(--radius); }
+    
+    /* --- Table --- */
+    .table { --bs-table-bg: transparent; }
+    .table thead th { color: var(--muted-foreground); font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--border); }
+    .table tbody td { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .table tfoot td { padding: 1rem 1.25rem; font-weight: 500; }
+    .table tfoot tr { border-top: 2px solid var(--foreground); }
+    .product-image-sm { width: 48px; height: 48px; object-fit: cover; border-radius: var(--radius); }
+
+    .payment-card.sticky-top { top: 90px; } /* Adjust sticky position for fixed navbar */
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}"><i class="fas fa-store me-2"></i>MicroStore</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link position-relative cart-link" href="{{ url_for('view_cart') }}">
+                    <i class="fas fa-shopping-cart fa-lg"></i>
+                    {% if session.get('cart') %}
+                    <span class="badge rounded-pill cart-badge">{{ session.cart.values()|sum }}</span>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-4">
+        <header class="page-header mb-4">
+            <h1 class="h3 page-title">Checkout</h1>
+        </header>
+
+        <div class="row g-5">
+            <div class="col-lg-7">
+                <div class="content-card">
+                    <div class="card-header bg-transparent">
+                        <h5 class="mb-0">Order Summary</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if cart_items %}
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th class="text-center">Qty</th>
+                                        <th class="text-end">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in cart_items %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="{{ item.product.image_url or 'https://via.placeholder.com/64' }}" alt="{{ item.product.name }}" class="product-image-sm me-3">
+                                                <div>
+                                                    <strong class="d-block">{{ item.product.name }}</strong>
+                                                    <small class="text-secondary font-mono">${{ "%.2f"|format(item.product.price|float) }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center font-mono">{{ item.quantity }}</td>
+                                        <td class="text-end font-mono"><strong>${{ "%.2f"|format(item.item_total|float) }}</strong></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="2" class="text-end"><strong>Grand Total:</strong></td>
+                                        <td class="text-end h5 mb-0 font-mono"><strong>${{ "%.2f"|format(total|float) }}</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center p-5">
+                            <i class="fas fa-shopping-cart fa-3x text-secondary mb-3"></i>
+                            <h5>Your cart is empty</h5>
+                            <p class="text-secondary">Add products to your cart before checking out.</p>
+                            <a href="{{ url_for('index') }}" class="btn btn-primary mt-2">Continue Shopping</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                {% if cart_items %}
+                <div class="content-card payment-card sticky-top">
+                    <div class="card-header bg-transparent">
+                        <h5 class="mb-0"><i class="fas fa-credit-card me-2"></i>Payment Details</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="POST" action="{{ url_for('checkout') }}" id="checkoutForm">
+                            <div class="mb-4">
+                                <label for="user_id" class="form-label">Select Customer Account</label>
+                                {% if users %}
+                                <select class="form-select" id="user_id" name="user_id" required>
+                                    <option value="" disabled selected>Choose an account for this purchase...</option>
+                                    {% for user in users %}
+                                    <option value="{{ user.id }}" data-balance="{{ user.cash_balance|float }}">
+                                        {{ user.name }} (Balance: ${{ "%.2f"|format(user.cash_balance|float) }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                {% else %}
+                                <div class="alert alert-warning small"><i class="fas fa-exclamation-triangle me-1"></i> No customers available.</div>
+                                {% endif %}
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-3"><strong class="h5">Order Total:</strong><strong class="h5 font-mono">${{ "%.2f"|format(total|float) }}</strong></div>
+                            <div class="alert alert-danger small" id="balanceWarning" style="display: none;"><i class="fas fa-exclamation-triangle me-2"></i><strong>Insufficient Balance:</strong> This customer does not have enough funds for this purchase.</div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" {% if not users %}disabled{% endif %}><i class="fas fa-lock me-2"></i> Place Order</button>
+                                <a href="{{ url_for('view_cart') }}" class="btn btn-secondary"><i class="fas fa-arrow-left me-2"></i> Back to Cart</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userSelect = document.querySelector('select[name="user_id"]');
+            const balanceWarning = document.getElementById('balanceWarning');
+            const submitBtn = document.getElementById('submitBtn');
+            const totalAmount = parseFloat("{{ total|float }}");
+
+            function validateBalance() {
+                if (!userSelect || !userSelect.value) {
+                    submitBtn.disabled = true;
+                    balanceWarning.style.display = 'none';
+                    return;
+                }
+                const selectedOption = userSelect.options[userSelect.selectedIndex];
+                const userBalance = parseFloat(selectedOption.getAttribute('data-balance'));
+
+                if (userBalance < totalAmount) {
+                    balanceWarning.style.display = 'block';
+                    submitBtn.disabled = true;
+                } else {
+                    balanceWarning.style.display = 'none';
+                    submitBtn.disabled = false;
+                }
+            }
+
+            if (userSelect) {
+                userSelect.addEventListener('change', validateBalance);
+                
+                if (!userSelect.value) {
+                    for (let option of userSelect.options) {
+                        const balance = parseFloat(option.getAttribute('data-balance'));
+                        if (option.value && balance >= totalAmount) {
+                            userSelect.value = option.value;
+                            break;
+                        }
+                    }
+                }
+                validateBalance();
+            }
+
+            const checkoutForm = document.getElementById('checkoutForm');
+            if (checkoutForm) {
+                checkoutForm.addEventListener('submit', function() {
+                    if (submitBtn) {
+                        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing...';
+                        submitBtn.disabled = true;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
